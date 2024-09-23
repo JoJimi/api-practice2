@@ -27,25 +27,22 @@ public class JwtAuthentificationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        // TODO: JWT 인증 로직
-        String BEARER_PERFIX = "Bearer ";
+        String BEARER_PREFIX = "Bearer ";
         var authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
         var securityContext = SecurityContextHolder.getContext();
 
-        if(!ObjectUtils.isEmpty(authorization) &&
-            authorization.startsWith(BEARER_PERFIX) &&
-                        securityContext.getAuthentication() == null){
-            var accessToken = authorization.substring(BEARER_PERFIX.length());
+        if(!ObjectUtils.isEmpty(authorization)
+                && authorization.startsWith(BEARER_PREFIX)
+                && securityContext.getAuthentication() == null){
+            var accessToken = authorization.substring(BEARER_PREFIX.length());
             var username = jwtService.getUsername(accessToken);
             var userDetails = userService.loadUserByUsername(username);
-
 
             var authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             securityContext.setAuthentication(authenticationToken);
             SecurityContextHolder.setContext(securityContext);
         }
-
 
         filterChain.doFilter(request, response);
     }
