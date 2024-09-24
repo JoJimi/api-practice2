@@ -1,3 +1,4 @@
+# 연습
 - jwt 연결 
 - slack API 사용
 - redis 적용
